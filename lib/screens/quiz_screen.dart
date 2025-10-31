@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/category.dart';
 import '../providers/question_provider.dart';
+import 'quiz_result_screen.dart';
 
 class QuizScreenConfig extends ConsumerStatefulWidget {
   final Category category;
@@ -23,16 +24,19 @@ class QuizScreenConfig extends ConsumerStatefulWidget {
 
 class _QuizScreenConfigState extends ConsumerState<QuizScreenConfig> {
   int currentIndex = 0;
+  List<String?> userAnswers = [];
 
   @override
   Widget build(BuildContext context) {
     final questionsAsyncValue = ref.watch(
-      questionProvider({
-        'amount': widget.amount,
-        'categoryId': widget.category.id,
-        'difficulty': widget.difficulty.toLowerCase(),
-        'type': widget.type.toLowerCase(),
-      }),
+      questionProvider(
+        QuestionParams(
+          amount: widget.amount,
+          categoryId: widget.category.id,
+          difficulty: widget.difficulty.toLowerCase(),
+          type: widget.type.toLowerCase(),
+        ),
+      ),
     );
 
     return Scaffold(
@@ -41,52 +45,56 @@ class _QuizScreenConfigState extends ConsumerState<QuizScreenConfig> {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, _) => Center(child: Text("Error: $err")),
         data: (questions) {
-          if (questions.isEmpty) return const Center(child: Text("No questions found"));
+          if (questions.isEmpty) {
+            return const Center(child: Text("No questions found"));
+          }
+
+          // initialize userAnswers list
+          if (userAnswers.isEmpty) {
+            userAnswers = List<String?>.filled(questions.length, null);
+          }
 
           final q = questions[currentIndex];
 
-          return Padding(
+          return ListView(
             padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Q${currentIndex + 1}: ${q.question}",
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 20),
-                ...q.allAnswers.map(
-                  (ans) => Card(
-                    child: ListTile(
-                      title: Text(ans),
-                      onTap: () {
-                        // Next question logic
+            children: [
+              Text(
+                "Q${currentIndex + 1}: ${q.question}",
+                style: const TextStyle(
+                    fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              ...q.allAnswers.map(
+                (ans) => Card(
+                  color: userAnswers[currentIndex] == ans
+                      ? Colors.blue[100]
+                      : null,
+                  child: ListTile(
+                    title: Text(ans),
+                    onTap: () {
+                      setState(() {
+                        userAnswers[currentIndex] = ans;
                         if (currentIndex < questions.length - 1) {
-                          setState(() {
-                            currentIndex++;
-                          });
+                          currentIndex++;
                         } else {
-                          // Quiz finished
-                          showDialog(
-                            context: context,
-                            builder: (_) => AlertDialog(
-                              title: const Text("Quiz Finished!"),
-                              content: const Text("You have reached the end."),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: const Text("OK"),
-                                )
-                              ],
+                          // navigate to result screen
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => QuizResultScreen(
+                                questions: questions,
+                                userAnswers: userAnswers,
+                              ),
                             ),
                           );
                         }
-                      },
-                    ),
+                      });
+                    },
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           );
         },
       ),

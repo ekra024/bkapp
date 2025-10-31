@@ -8,7 +8,7 @@ class WelcomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: Container(
+        body: SizedBox(
           width: double.infinity,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -30,7 +30,7 @@ class WelcomeScreen extends StatelessWidget {
                   height: 40,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: const Color.fromRGBO(2, 122, 107, 1),
+                    
                   ),
                   child: Center(child: Text('GET STARTED', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),)),
                 ),

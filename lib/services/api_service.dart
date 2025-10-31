@@ -41,9 +41,12 @@ class ApiService {
     final response = await http.get(uri);
     final data = jsonDecode(response.body);
 
+    print("Raw API response: $data");
+
     if (data["response_code"] != 0) return [];
 
     List results = data["results"];
+    print("Questions parsed: ${results.length}");
     return results.map((e) => Question.fromJson(e)).toList();
   }
 }
