@@ -36,12 +36,12 @@ class ApiService {
     }
 
     final uri = Uri.https("opentdb.com", "/api.php", queryParams);
-    print("FETCH URL: $uri");
+  
 
     final response = await http.get(uri);
     final data = jsonDecode(response.body);
 
-    print("Raw API response: $data");
+   
 
     if (data["response_code"] != 0) return [];
 
