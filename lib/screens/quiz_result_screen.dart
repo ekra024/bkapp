@@ -50,6 +50,38 @@ class QuizResultScreen extends StatelessWidget {
                 },
               ),
             ),
+
+            SizedBox(height: 20),
+             InkWell(
+                onTap: () => {
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    '/category',
+                    (route) => false,
+                  ),
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Color.fromRGBO(2, 112, 107, 2),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 80,
+                      vertical: 15,
+                    ),
+                    child: Text(
+                      'PLAY AGAIN',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
           ],
         ),
       ),
